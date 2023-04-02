@@ -28,14 +28,45 @@ def Cosine_Similarity(count_matrix):
     return cosine_similarity(count_matrix)
 
 def get_index_from_title(data, title):
-        return data[data.title == title]["index"].values[0]   
+       try: 
+            index = data[data.title == title]["index"].values[0]
+            return index   
+       except:
+            st.subheader("There is no similar books")
 
 def get_title_from_index(data, index):
-    return data[data.index == index]["title"].values[0]        
+    return data[data.index == index]["title"].values[0]
+
+def get_all_details_from_index(data, index):
+    return data[data.index == index]["title"].values[0]
+
+
+def recommend_books(cosine_sim, data):
+        book_user_likes = "Between Two Fires: American Indians in the Civil War"
+        print(data.columns)
+
+        # User Input 
+        user_input = st.text_input("Enter the book title that you like", book_user_likes)
+        print(user_input)
+
+        if (user_input != None):
+            book_index = get_index_from_title(data, user_input)
+            similar_books = list(enumerate(cosine_sim[book_index]))
+
+            sorted_similar_books = sorted(similar_books, key=lambda x:x[1], reverse=True)
+
+            if (len(similar_books) > 1):
+                st.subheader("Here are some books in no particular order")
+                i=0
+                for book in sorted_similar_books:
+                    st.write(i + 1 , ". ", get_title_from_index(data, int(book[0])))
+                    i=i+1
+                    if i>15: 
+                        break
 
 
 data_load_state = st.text('Loading data....')
-data = load_data(15000)
+data = load_data(20000)
 data_load_state.text('Loading data....done!')
 data["combined_features"] = data.apply(combined_features, axis =1)
 cv = CountVectorizer()
@@ -45,21 +76,4 @@ print("Count Matrix:", count_matrix.toarray())
 print(cosine_sim)
 st.subheader('Raw data')
 st.write(data)
-
-book_user_likes = "Between Two Fires: American Indians in the Civil War"
-print(data.columns)
-
-# User Input 
-user_input = st.text_input("Enter the book title that you like", "Harry Potter")
-
-book_index = get_index_from_title(data, book_user_likes)
-similar_books = list(enumerate(cosine_sim[book_index]))
-
-sorted_similar_books = sorted(similar_books, key=lambda x:x[1], reverse=True)
-
-i=0
-for book in sorted_similar_books:
-    st.write(get_title_from_index(data, int(book[0])))
-    i=i+1
-    if i>15:
-        break
+recommend_books(cosine_sim=cosine_sim, data=data)
