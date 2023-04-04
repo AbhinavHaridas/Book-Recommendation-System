@@ -62,7 +62,7 @@ def detailed_view(title, description, rating, image, link, genres):
     st.image(image, width=200)
     st.write(f"<br />", unsafe_allow_html=True)
     st.write(f"<p>{description}</p>", unsafe_allow_html=True)
-    st.write(f"<p><b>genres: </b>{genres}</p>", unsafe_allow_html=True)
+    st.write(f"<p><b>Genres: </b>{genres}</p>", unsafe_allow_html=True)
     st.write(f"<p><b>Rating: </b>{rating}/5</p>", unsafe_allow_html=True)
     st.write(f'<a href="{link}" target="_blank">Learn more</a>', unsafe_allow_html=True)
     return ""
@@ -85,7 +85,6 @@ def recommend_books(cosine_sim, data):
             similar_books, key=lambda x: x[1], reverse=True)
 
         if (len(similar_books) > 1):
-            # st.subheader("Here are some books in no particular order")
             i = 0
             for book in sorted_similar_books:
                 [title, description, rating, image, link, genres] = get_all_details_from_index(data, int(book[0]))
@@ -119,7 +118,6 @@ def main():
     cv = CountVectorizer()
     count_matrix = cv.fit_transform(data["combined_features"])
     cosine_sim = Cosine_Similarity(count_matrix)
-    # st.write(data)
     print("Count Matrix:", count_matrix.toarray())
     print(cosine_sim)
     recommend_books(cosine_sim=cosine_sim, data=data)
